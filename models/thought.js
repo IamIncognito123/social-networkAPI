@@ -1,4 +1,5 @@
-const {Schema, Types} = require('mongoose');
+const {Schema, Types, model} = require('mongoose');
+const reactionSchema = require('./reaction')
 
 const thoughtSchema = new Schema(
     {
@@ -18,6 +19,7 @@ const thoughtSchema = new Schema(
         },
         reactions: [reactionSchema]
     },
+    // allows virtuals to be implemented in the schema 
     {
         toJSON: {
             virtuals: true,

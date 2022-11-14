@@ -1,4 +1,4 @@
-const {Thought, User} = require('../controllers')
+const {Thought, User} = require('../models');
 
 module.exports = {
     getUsers(req, res){
@@ -16,7 +16,7 @@ module.exports = {
             .catch((err) => res.status(500).json(err));
     },
     createUser(req, res){
-        User.insertOne(req.body)
+        User.create(req.body)
             .then((user) => res.json(user))
             .catch((err) => {
                 console.log(err);
@@ -37,5 +37,24 @@ module.exports = {
                 ? res.status(404).json({message: 'No user with that ID'})
                 : User.deleteMany({_id})
             )
+    },
+    addFriend(req, res){
+        User.create(req.body)
+            .then((friend) => res.json(friend))
+            .catch((err) => res.status(404).json(err))
+    },
+    removeFriend(req, res){
+        User.findOneAndUpdate(
+            {_id: req.params.userId},
+            {$pull: {friend: {_id: req.params.friendId}}},
+            {runValidators: true, new: true}
+        )
+            .then((friend) => 
+                !friend
+                ? res.status(404).json({message: 'No friend with that ID'})
+                : res.json(friend)
+            )
+            .catch((err) => res.status(500).json(err))
+
     }
 }
