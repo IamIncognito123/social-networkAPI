@@ -12,10 +12,10 @@ const userSchema = new Schema(
         type: String,
         required: true,
         unique: true,
-        validate: {
-            validator: () => Promise.resolve(false),
-            message: 'Unable to validate email.'
-        }
+        // validate: {
+        //     validator: () => Promise.resolve(false),
+        //     message: 'Unable to validate email.'
+        // }
        },
        thought: [
         {

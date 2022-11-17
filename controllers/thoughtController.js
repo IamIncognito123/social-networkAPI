@@ -39,28 +39,29 @@ module.exports = {
     },
     deleteThought(req, res){
         Thought.findOneAndRemove({_id: req.params.thoughtId})
-            .then((thought) => 
-                !thought
+            // .then((thought) => 
+            //     !thought
+            //     ? res.status(404).json({message: 'No thought with that Id'})
+            //     : User.findOneAndUpdate(
+            //         {thought: req.params.thoughtId},
+            //         {$pull: {thought: req.params.thoughtId}},
+            //         {new: true}
+            //     )
+            // )
+            .then((user) => 
+                !user
                 ? res.status(404).json({message: 'No thought with that Id'})
-                : User.findOneAndUpdate(
-                    {thought: req.params.thoughtId},
-                    {$pull: {thought: req.params.thoughtId}},
-                    {new: true}
-                )
-            )
-            .then((course) => 
-                !course 
-                ? res.status(404).json({message: 'Thought deleted, but no course found'})
-                : res.json({message: 'Thought successfully deleted, course updated.'})
+                : res.json({message: 'Thought successfully deleted, user updated.'})
             )
             .catch((err) => 
                 res.status(500).json(err)
             )
     },
     createReactions(req, res){
-        Thought.create(
+        Thought.findOneAndUpdate(
             {_id: req.params.thoughtId},
-            {$push: {reactions: req.body}}
+            {$set: {reactions: req.body}},
+            {runValidators: true, new: true}
         )
             .then((thought) => 
                 !thought
@@ -72,14 +73,15 @@ module.exports = {
             )
     },
     deleteReaction(req, res){
-        Thought.findOneAndRemove(
+        Thought.findOneAndUpdate(
             {_id: req.params.thoughtId},
-            // {$pull: {reactions: req.params.reactionId}},
-            {$pull: {reactions: {reactionId: req.params.reactionId}}},
+            // unset removes a field, pull removes a value from the field
+            {$unset: {reactions: {_id: req.params.reactionId}}},
+            // {$pull: {reactions: reactionBody}},
             {runValidators: true, new: true}
         )
             .then((thought) => 
-                res.status(404).json({message: 'No thought with that Id'})
+                res.json(thought)
             )
             .catch((err) => res.status(500).json(err))
     }

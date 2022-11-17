@@ -11,7 +11,7 @@ module.exports = {
             .then((user) => 
                 !user
                 ?res.status(404).json({message: 'No user with that ID'})
-                :res.json(course)
+                :res.json(user)
             )
             .catch((err) => res.status(500).json(err));
     },
@@ -29,24 +29,34 @@ module.exports = {
             {$set: req.body},
             {runValidators: true, new: true}
         )
+            .then((user) => 
+                !user
+                ?res.status(404).json({message: 'No user with that id'})
+                :res.json(user)
+            )
+            .catch((err) => res.json(err))
     },
     deleteUser(req, res){
         User.findOneAndDelete({_id: req.params.userId})
             .then((user) => 
                 ! user
                 ? res.status(404).json({message: 'No user with that ID'})
-                : User.deleteMany({_id})
+                :res.json({message: 'User has been deleted'})
             )
     },
     addFriend(req, res){
-        User.create(req.body)
+        User.findByIdAndUpdate(
+            {_id: req.params.userId},
+            {$push: {friend: {_id: req.params.friendId}}},
+            {runValidators: true, new: true}
+        )
             .then((friend) => res.json(friend))
             .catch((err) => res.status(404).json(err))
     },
     removeFriend(req, res){
         User.findOneAndUpdate(
             {_id: req.params.userId},
-            {$pull: {friend: {_id: req.params.friendId}}},
+            {$pull: {friend: req.params.friendId}},
             {runValidators: true, new: true}
         )
             .then((friend) => 
